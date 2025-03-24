@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChattaBox</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <div id="messages"></div>
+        <input type="text" id="message-input" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('response', function(data) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `<p>${data.data}</p>`;
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value;
+            socket.send(message);
+            input.value = '';
+        }
+    </script>
+</body>
+</html>
