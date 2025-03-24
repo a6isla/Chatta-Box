@@ -8,25 +8,53 @@
 </head>
 <body>
     <div class="chat-container">
-        <div id="messages"></div>
-        <input type="text" id="message-input" placeholder="Type your message...">
-        <button onclick="sendMessage()">Send</button>
+        <div class="header">Welcome to ChattaBox</div>
+
+        <!-- Username input form -->
+        <div id="username-container" class="username-container">
+            <input type="text" id="username-input" placeholder="Enter your username">
+            <button id="join-button" onclick="joinChat()">Join Chat</button>
+        </div>
+
+        <!-- Chat area -->
+        <div id="chat-container" style="display: none;">
+            <div id="messages" class="message-box"></div>
+            <div class="input-container">
+                <input type="text" id="message-input" placeholder="Type a message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
     <script>
         const socket = io();
+        let username = null;
 
         socket.on('response', function(data) {
             const messagesDiv = document.getElementById('messages');
-            messagesDiv.innerHTML += `<p>${data.data}</p>`;
+            messagesDiv.innerHTML += `<p><strong>${data.username}:</strong> ${data.message}</p>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
+
+        function joinChat() {
+            username = document.getElementById('username-input').value;
+            if (username) {
+                document.getElementById('username-container').style.display = 'none';
+                document.getElementById('chat-container').style.display = 'block';
+                socket.emit('join', username);
+            } else {
+                alert("Please enter a username.");
+            }
+        }
 
         function sendMessage() {
             const input = document.getElementById('message-input');
             const message = input.value;
-            socket.send(message);
-            input.value = '';
+            if (message) {
+                socket.send({ username: username, message: message });
+                input.value = '';
+            }
         }
     </script>
 </body>
