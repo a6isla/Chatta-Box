@@ -1,10 +1,13 @@
+import eventlet
+eventlet.monkey_patch()  # This must be at the top
+
 from flask import Flask, render_template, request, session
 from flask_socketio import SocketIO, send
 import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")  # Ensure async_mode is set
 
 # Store messages for new users to see past messages
 messages = []
